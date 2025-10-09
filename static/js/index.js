@@ -140,88 +140,128 @@ $(document).ready(function() {
     setupVideoCarouselAutoplay();
 
     /**
-     * 重置 GIF 以实现循环播放。
-     * 对于浏览器中作为 <img> 的 GIF，没有原生 loop 属性控制每次播放结束后的事件；
-     * 通过替换 src（追加一个虚拟查询参数）强制浏览器重新加载，从而实现无缝循环。
-     * 只有当元素进入视窗时才开始循环，离开视窗时停止，避免资源浪费。
+     * 稳定循环播放 GIF：
+     * - 进入视窗时启动，离开视窗或页面隐藏时暂停
+     * - 通过离屏预加载 + decode 后再替换 src，避免闪烁
+     * - 支持通过 data-interval(ms) 自定义刷新间隔；未设置时使用保守默认值
      * @returns {void}
      */
-    (function setupLoopingGifs() {
-        const gifs = document.querySelectorAll('img.looping-gif');
-        if (gifs.length === 0) return;
+    (function setupStableGifLooping() {
+        const gifImages = document.querySelectorAll('img.looping-gif');
+        if (gifImages.length === 0) return;
 
         /**
-         * 为单个 GIF 启动循环刷新。
-         * @param {HTMLImageElement} img - 目标 GIF 图像元素
-         * @returns {() => void} 取消函数
+         * 获取基础 URL（去除 cache-busting 查询参数）。
+         * @param {HTMLImageElement} img - 目标 GIF
+         * @returns {string}
          */
-        function startLoop(img) {
-            // 若作者提前设置了 data-interval(ms)，则使用；否则默认 0 代表按自然时长刷新
-            const customInterval = Number(img.getAttribute('data-interval'));
+        function getBaseSrc(img) {
+            const raw = img.getAttribute('data-src') || img.src || '';
+            const idx = raw.indexOf('?');
+            return idx >= 0 ? raw.slice(0, idx) : raw;
+        }
 
-            let rafId = 0;
-            let lastWidth = 0;
+        /**
+         * 预加载并无缝替换 src 以重启 GIF 播放。
+         * @param {HTMLImageElement} img - 目标 GIF
+         * @param {() => void} onDone - 完成回调
+         * @returns {void}
+         */
+        function reloadGifOnce(img, onDone) {
+            const base = getBaseSrc(img);
+            img.setAttribute('data-src', base);
+            const nextUrl = base + '?_=' + Date.now();
 
-            // 使用 setTimeout 基于 naturalWidth 的变化估计 GIF 加载完成后再触发首次刷新
-            let timerId = 0;
+            const preloader = new Image();
+            preloader.decoding = 'sync';
+            // 尽量继承属性，减少跨域与策略差异
+            preloader.crossOrigin = img.crossOrigin || null;
+            if (img.referrerPolicy) preloader.referrerPolicy = img.referrerPolicy;
 
-            // 估算一帧刷新：通过重置 src 实现
-            const refresh = () => {
-                const baseSrc = img.getAttribute('data-src') || img.src.split('?')[0];
-                img.setAttribute('data-src', baseSrc);
-                img.src = baseSrc + '?_=' + Date.now();
+            const finalize = () => {
+                img.src = nextUrl;
+                if (typeof onDone === 'function') onDone();
             };
 
-            // 如果未提供间隔，则尝试通过观察 naturalWidth 与完整解码来延后刷新触发
-            const scheduleNext = () => {
-                if (Number.isFinite(customInterval) && customInterval > 0) {
-                    timerId = window.setTimeout(refresh, customInterval);
+            preloader.onload = () => {
+                if (typeof preloader.decode === 'function') {
+                    preloader.decode().then(finalize).catch(finalize);
                 } else {
-                    // 回退策略：大多数浏览器会在 GIF 末尾停住最后一帧一小段时间；
-                    // 这里保守选取 3000ms，用户可通过 data-interval 覆盖。
-                    timerId = window.setTimeout(refresh, 3000);
+                    finalize();
                 }
             };
+            preloader.onerror = finalize;
+            preloader.src = nextUrl;
+        }
 
-            // 当尺寸首次稳定后开始调度
-            const onFrame = () => {
-                const w = img.naturalWidth;
-                if (w !== 0 && w === lastWidth) {
-                    scheduleNext();
-                    return;
-                }
-                lastWidth = w;
-                rafId = window.requestAnimationFrame(onFrame);
+        /**
+         * 启动对单个 GIF 的稳定循环。
+         * @param {HTMLImageElement} img - 目标 GIF
+         * @returns {() => void} 停止函数
+         */
+        function startStableLoop(img) {
+            const customInterval = Number(img.getAttribute('data-interval'));
+            const intervalMs = Number.isFinite(customInterval) && customInterval > 0 ? customInterval : 3000;
+
+            let timerId = 0;
+            let stopped = false;
+
+            const schedule = () => {
+                if (stopped) return;
+                timerId = window.setTimeout(() => {
+                    reloadGifOnce(img, () => {
+                        // 下一次在刷新完成后再排程，避免竞争
+                        schedule();
+                    });
+                }, intervalMs);
             };
 
-            rafId = window.requestAnimationFrame(onFrame);
+            // 首次调度：若 GIF 本身会自然循环，下面的刷新可视为“保底”以避免停顿
+            schedule();
 
             return () => {
+                stopped = true;
                 window.clearTimeout(timerId);
-                if (rafId) window.cancelAnimationFrame(rafId);
             };
         }
 
-        const stopFns = new Map();
+        const stopHandles = new Map();
 
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
+        const io = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
                 const img = entry.target;
                 if (entry.isIntersecting) {
-                    if (!stopFns.has(img)) {
-                        const stop = startLoop(img);
-                        stopFns.set(img, stop);
+                    if (!stopHandles.has(img)) {
+                        const stop = startStableLoop(img);
+                        stopHandles.set(img, stop);
                     }
                 } else {
-                    const stop = stopFns.get(img);
+                    const stop = stopHandles.get(img);
                     if (stop) {
                         stop();
-                        stopFns.delete(img);
+                        stopHandles.delete(img);
                     }
                 }
             });
-        }, { threshold: 0.2 });
+        }, { threshold: 0.5 });
 
-        gifs.forEach(img => observer.observe(img));
+        // 页面可见性变化时暂停/恢复，节约资源
+        document.addEventListener('visibilitychange', () => {
+            const hidden = document.hidden;
+            gifImages.forEach((img) => {
+                const stop = stopHandles.get(img);
+                if (hidden && stop) {
+                    stop();
+                    stopHandles.delete(img);
+                } else if (!hidden && io) {
+                    // 触发一次重新判定
+                    io.unobserve(img);
+                    io.observe(img);
+                }
+            });
+        });
+
+        gifImages.forEach(img => io.observe(img));
     })();
 })
+
