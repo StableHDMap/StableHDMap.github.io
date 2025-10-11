@@ -326,35 +326,6 @@
       <h2 class="subtitle has-text-left">
         Evaluating trustworthiness of online mapping models using human judgment, traditional mAP, and our mAS metric. In each case, the standard accuracy metric (mAP) fails to align with human judgment because it evaluates only single-frame precision, disregarding stability across time. To address this limitation, we propose the first stability benchmark for online vectorized map construction and present a large-scale analysis of contemporary models.
       </h2>
-      <img src="static/images/downstream.png" alt="The impact of unstable map elements on downstream tasks" style="width: 100%; height: auto; max-height: 500px; object-fit: contain;">
-      <!-- TODO: Replace with your image description -->
-      <h2 class="subtitle has-text-left">
-        <strong></strong>The impact of unstable map elements on downstream tasks.</strong> In Scenario A, the ego vehicle attempts to overtake, but the forward lane divider suddenly disappears during the maneuver, causing the ego vehicle to steer toward the curb. In Scenario B, another vehicle attempts to change lanes, but due to flickering lane dividers in the ego vehicle's perception, the ego vehicle interprets the other vehicle's action as a collision course.
-      </h2>
-      <img src="static/images/radar_map.png" alt="Radar chart for Basic HD map constructors covering eight evaluation metrics" style="width: 100%; height: auto; max-height: 500px; object-fit: contain;">
-      <!-- TODO: Replace with your image description -->
-      <h2 class="subtitle has-text-left">
-        <strong>Radar chart for Basic HD map constructors covering eight evaluation metrics.</strong> The axes of the radar chart correspond to: #1 mAS, #2 Shape, #3 Loc, #4 Presence, #5 mAP, #6 Inference Memory Cost, #7 Parameter Count, #8 FPS.
-      </h2>
-      <img src="static/images/temporal_vis.png" alt="Discussion of temporal fusion" style="width: 100%; height: auto; max-height: 500px; object-fit: contain;">
-      <!-- TODO: Replace with your image description -->
-      <h2 class="subtitle has-text-left">
-        <strong>Discussion of Temporal Fusion.</strong> The effectiveness of temporal fusion is highly dependent on architectural compatibility.
-      </h2>
-      <div class="columns is-variable is-6 is-vcentered">
-        <div class="column">
-          <figure class="image">
-            <video class="looping-video" src="static/images/maptr_r50_gkt_24e.mp4" playsinline muted loop autoplay style="width: 100%; height: auto; object-fit: contain; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);"></video>
-            <!-- <figcaption class="has-text-centered is-size-6 has-text-grey">Add caption here.</figcaption> -->
-          </figure>
-        </div>
-        <div class="column">
-          <figure class="image">
-            <video class="looping-video" src="static/images/maptr_r50_gkt_24e_t4.mp4" playsinline muted loop autoplay style="width: 100%; height: auto; object-fit: contain; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);"></video>
-            <!-- <figcaption class="has-text-centered is-size-6 has-text-grey">Add caption here.</figcaption> -->
-          </figure>
-        </div>
-      </div>
     </div>
   </div>
 </section>
@@ -377,4 +348,59 @@
   </div>
 </section>
 <!-- End paper abstract -->
+
+<!-- Media showcase -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered">Visual Results</h2>
+
+    <!-- Downstream impact -->
+    <div class="box">
+      <figure class="image">
+        <img src="static/images/downstream.png" alt="The impact of unstable map elements on downstream tasks" style="width: 100%; height: auto; object-fit: contain;">
+      </figure>
+      <p class="subtitle has-text-left" style="margin-top: 0.75rem;">
+        <strong>The impact of unstable map elements on downstream tasks.</strong> In Scenario A, the ego vehicle attempts to overtake, but the forward lane divider suddenly disappears during the maneuver, causing the ego vehicle to steer toward the curb. In Scenario B, another vehicle attempts to change lanes, but due to flickering lane dividers in the ego vehicle's perception, the ego vehicle interprets the other vehicle's action as a collision course.
+      </p>
+    </div>
+
+    <!-- Radar chart -->
+    <div class="box">
+      <figure class="image">
+        <img src="static/images/radar_map.png" alt="Radar chart for Basic HD map constructors covering eight evaluation metrics" style="width: 100%; height: auto; object-fit: contain;">
+      </figure>
+      <p class="subtitle has-text-left" style="margin-top: 0.75rem;">
+        <strong>Radar chart for Basic HD map constructors covering eight evaluation metrics.</strong> The axes of the radar chart correspond to: #1 mAS, #2 Shape, #3 Loc, #4 Presence, #5 mAP, #6 Inference Memory Cost, #7 Parameter Count, #8 FPS.
+      </p>
+    </div>
+
+    <!-- Temporal fusion -->
+    <div class="box">
+      <figure class="image">
+        <img src="static/images/temporal_vis.png" alt="Discussion of temporal fusion" style="width: 100%; height: auto; object-fit: contain;">
+      </figure>
+      <p class="subtitle has-text-left" style="margin-top: 0.75rem;">
+        <strong>Discussion of Temporal Fusion.</strong> The effectiveness of temporal fusion is highly dependent on architectural compatibility.
+      </p>
+    </div>
+
+    <!-- Video demos -->
+    <div class="box">
+      <div class="columns is-variable is-6 is-vcentered">
+        <div class="column">
+          <figure class="image">
+            <video class="looping-video" src="static/images/maptr_r50_gkt_24e.mp4" playsinline muted loop autoplay style="width: 100%; height: auto; object-fit: contain; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);"></video>
+          </figure>
+        </div>
+        <div class="column">
+          <figure class="image">
+            <video class="looping-video" src="static/images/maptr_r50_gkt_24e_t4.mp4" playsinline muted loop autoplay style="width: 100%; height: auto; object-fit: contain; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);"></video>
+          </figure>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+<!-- End media showcase -->
 
