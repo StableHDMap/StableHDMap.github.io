@@ -362,6 +362,14 @@
               <strong>Basic Benchmarking of HD Map Constructors.</strong> comparison of online HD mapping methods on nuScenes val set. Models grouped by temporal fusion mechanisms, input modality, BEV encoder and training epochs. “Temp" denotes the injection of temporal information. “L” and “C” represent LiDAR and camera respectively, while the 2D and 3D backbones employ ResNet50  and SECOND, correspondingly.
             </p>
           </div>
+          <div class="box">
+            <figure class="image">
+              <img src="static/images/radar_map.png" alt="Radar chart for Basic HD map constructors covering eight evaluation metrics" style="width: 100%; height: auto; object-fit: contain;">
+            </figure>
+            <p class="subtitle has-text-left" style="margin-top: 0.75rem;">
+              <strong>Radar chart for Basic HD map constructors covering eight evaluation metrics.</strong> The axes of the radar chart correspond to: #1 mAS, #2 Shape, #3 Loc, #4 Presence, #5 mAP, #6 Inference Memory Cost, #7 Parameter Count, #8 FPS.
+            </p>
+          </div>
       </div>
     </div>
   </div>
@@ -380,14 +388,7 @@
               <strong>The impact of unstable map elements on downstream tasks.</strong> In Scenario A, the ego vehicle attempts to overtake, but the forward lane divider suddenly disappears during the maneuver, causing the ego vehicle to steer toward the curb. In Scenario B, another vehicle attempts to change lanes, but due to flickering lane dividers in the ego vehicle's perception, the ego vehicle interprets the other vehicle's action as a collision course.
             </p>
           </div>
-          <div class="box">
-            <figure class="image">
-              <img src="static/images/radar_map.png" alt="Radar chart for Basic HD map constructors covering eight evaluation metrics" style="width: 100%; height: auto; object-fit: contain;">
-            </figure>
-            <p class="subtitle has-text-left" style="margin-top: 0.75rem;">
-              <strong>Radar chart for Basic HD map constructors covering eight evaluation metrics.</strong> The axes of the radar chart correspond to: #1 mAS, #2 Shape, #3 Loc, #4 Presence, #5 mAP, #6 Inference Memory Cost, #7 Parameter Count, #8 FPS.
-            </p>
-          </div>
+          
       </div>
     </div>
   </div>
